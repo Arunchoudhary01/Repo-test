@@ -1,0 +1,59 @@
+// AI Video Generator & Editor Web App
+// Frontend (React + TailwindCSS)
+
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/components/ui/input";
+
+export default function AIVideoEditorApp() {
+  const [prompt, setPrompt] = useState("");
+  const [videoURL, setVideoURL] = useState("");
+  const [audio, setAudio] = useState(null);
+
+  const generateVideo = async () => {
+    // Placeholder - replace with actual API
+    const response = await fetch("/api/generate", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ prompt }),
+    });
+    const data = await response.json();
+    setVideoURL(data.videoUrl); // expects { videoUrl: "..." }
+  };
+
+  const handleAudioUpload = (e) => {
+    const file = e.target.files[0];
+    setAudio(URL.createObjectURL(file));
+  };
+
+  return (
+    <div className="p-6 max-w-4xl mx-auto">
+      <h1 className="text-3xl font-bold mb-4">AI Video Generator & Editor</h1>
+      <Textarea
+        placeholder="Enter a prompt for the video..."
+        value={prompt}
+        onChange={(e) => setPrompt(e.target.value)}
+        className="mb-4"
+      />
+      <Button onClick={generateVideo}>Generate Video</Button>
+
+      {videoURL && (
+        <div className="mt-6">
+          <video
+            controls
+            src={videoURL}
+            className="w-full rounded-xl shadow-lg mb-4"
+          />
+
+          <label className="block mb-2 font-medium">Add Background Music:</label>
+          <Input type="file" accept="audio/*" onChange={handleAudioUpload} />
+
+          {audio && (
+            <audio controls src={audio} className="mt-2" />
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
